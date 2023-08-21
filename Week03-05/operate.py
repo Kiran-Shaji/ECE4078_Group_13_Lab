@@ -199,63 +199,66 @@ class Operate:
         for event in pygame.event.get():
             ############### add your codes below ###############
             # drive forward
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                self.pibot.set_velocity([1,0], 100, 50, 1) # TODO: replace with your code to make the robot drive forward
+            speed = 1
+            turn = 1
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    self.pibot.set_velocity([1,0]) # TODO: replace with your code to make the robot drive forward
 
 
-            # drive backward
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                self.pibot.set_velocity([-1,0], 100, 50, 1) # TODO: replace with your code to make the robot drive backward
+                # drive backward
+                elif event.key == pygame.K_DOWN:
+                    self.pibot.set_velocity([-1,0]) # TODO: replace with your code to make the robot drive backward
 
 
-            # turn left
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-                self.pibot.set_velocity([0,1], 100, 50, 1) # TODO: replace with your code to make the robot turn left
+                # turn left
+                elif event.key == pygame.K_LEFT:
+                    self.pibot.set_velocity([0,1]) # TODO: replace with your code to make the robot turn left
 
 
-            # drive right
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-                self.pibot.set_velocity([0,-1], 100, 50, 1) # TODO: replace with your code to make the robot turn right
+                # drive right
+                elif event.key == pygame.K_RIGHT:
+                    self.pibot.set_velocity([0,-1]) # TODO: replace with your code to make the robot turn right
 
-                    
-            ####################################################
-            # stop
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.command['motion'] = [0, 0]
-            # save image
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_i:
-                self.command['save_image'] = True
-            # save SLAM map
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                self.command['output'] = True
-            # reset SLAM map
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                if self.double_reset_comfirm == 0:
-                    self.notification = 'Press again to confirm CLEAR MAP'
-                    self.double_reset_comfirm +=1
-                elif self.double_reset_comfirm == 1:
-                    self.notification = 'SLAM Map is cleared'
-                    self.double_reset_comfirm = 0
-                    self.ekf.reset()
-            # run SLAM
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                n_observed_markers = len(self.ekf.taglist)
-                if n_observed_markers == 0:
-                    if not self.ekf_on:
-                        self.notification = 'SLAM is running'
-                        self.ekf_on = True
-                    else:
+                        
+                ####################################################
+                # stop
+                elif event.key == pygame.K_SPACE:
+                    self.command['motion'] = [0, 0]
+                # save image
+                elif event.key == pygame.K_i:
+                    self.command['save_image'] = True
+                # save SLAM map
+                elif event.key == pygame.K_s:
+                    self.command['output'] = True
+                # reset SLAM map
+                elif event.key == pygame.K_r:
+                    if self.double_reset_comfirm == 0:
+                        self.notification = 'Press again to confirm CLEAR MAP'
+                        self.double_reset_comfirm +=1
+                    elif self.double_reset_comfirm == 1:
+                        self.notification = 'SLAM Map is cleared'
+                        self.double_reset_comfirm = 0
+                        self.ekf.reset()
+                # run SLAM
+                elif event.key == pygame.K_RETURN:
+                    n_observed_markers = len(self.ekf.taglist)
+                    if n_observed_markers == 0:
+                        if not self.ekf_on:
+                            self.notification = 'SLAM is running'
+                            self.ekf_on = True
+                        else:
+                            self.notification = '> 2 landmarks is required for pausing'
+                    elif n_observed_markers < 3:
                         self.notification = '> 2 landmarks is required for pausing'
-                elif n_observed_markers < 3:
-                    self.notification = '> 2 landmarks is required for pausing'
-                else:
-                    if not self.ekf_on:
-                        self.request_recover_robot = True
-                    self.ekf_on = not self.ekf_on
-                    if self.ekf_on:
-                        self.notification = 'SLAM is running'
                     else:
-                        self.notification = 'SLAM is paused'
+                        if not self.ekf_on:
+                            self.request_recover_robot = True
+                        self.ekf_on = not self.ekf_on
+                        if self.ekf_on:
+                            self.notification = 'SLAM is running'
+                        else:
+                            self.notification = 'SLAM is paused'
             # quit
             elif event.type == pygame.QUIT:
                 self.quit = True
