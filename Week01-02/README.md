@@ -74,7 +74,7 @@ Zip your whole Week01-02 folder (including the util and pics folder, your modifi
 
 2. Open another terminal, or new tab in the existing terminal, navigate to the "Week01-02" folder which contains the operate.py script
 
-3. Connect to the physical robot and run the script with ```python3 operate.py --ip 192.168.50.1 --port 8080``` (change the ip address if you need to)
+3. Connect to the physical robot and run the script with ```python operate.py --ip 192.168.50.1 --port 8080``` (change the ip address if you need to)
 
 4. Demonstrate the teleoperation and good luck!
 ---
