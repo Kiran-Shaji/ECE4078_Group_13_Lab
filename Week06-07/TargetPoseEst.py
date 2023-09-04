@@ -35,10 +35,10 @@ def estimate_pose(camera_matrix, obj_info, robot_pose):
     # there are 8 possible types of fruits and vegs
     ######### Replace with your codes #########
     # TODO: measure actual sizes of targets [width, depth, height] and update the dictionary of true target dimensions
-    target_dimensions_dict = {'orange': [1.0,1.0,1.0], 'lemon': [1.0,1.0,1.0], 
-                              'lime': [1.0,1.0,1.0], 'tomato': [1.0,1.0,1.0], 
-                              'capsicum': [1.0,1.0,1.0], 'potato': [1.0,1.0,1.0], 
-                              'pumpkin': [1.0,1.0,1.0], 'garlic': [1.0,1.0,1.0]}
+    target_dimensions_dict = {'orange': [0.082,0.084,0.078], 'lemon': [0.08,0.053,0.05], 
+                              'lime': [0.08,0.053,0.05], 'tomato': [0.074,0.074,0.07], 
+                              'capsicum': [0.09,0.08,0.1], 'potato': [0.1,0.072,0.064], 
+                              'pumpkin': [0.085,0.085,0.08], 'garlic': [0.068,0.062,0.083]}
     #########
 
     # estimate target pose using bounding box and robot pose
@@ -79,7 +79,31 @@ def merge_estimations(target_pose_dict):
 
     ######### Replace with your codes #########
     # TODO: replace it with a solution to merge the multiple occurrences of the same class type (e.g., by a distance threshold)
-    target_est = target_pose_dict
+    distance_threshold = 0.2
+    target_est = {}
+
+    for key, pose in target_pose_dict.items():
+        # Check if there is already a similar target in target_est
+        merged = False
+        for existing_key, existing_pose in target_est.items():
+            # Calculate the distance between the new and existing poses
+            distance = np.sqrt((pose['x'] - existing_pose['x'])**2 + (pose['y'] - existing_pose['y'])**2)
+
+            if distance < distance_threshold:
+                # Merge the poses by averaging their positions
+                merged_pose = {
+                    'x': (pose['x'] + existing_pose['x']) / 2,
+                    'y': (pose['y'] + existing_pose['y']) / 2
+                }
+                target_est[existing_key] = merged_pose
+                merged = True
+                break
+
+        if not merged:
+            # If no similar target was found, add it as a new target
+            target_est[key] = pose
+
+    # target_est = target_pose_dict
     #########
    
     return target_est
