@@ -125,7 +125,7 @@ class EKF:
         for i in range(len(z)):
             if i%2 == 0:
                 z[i] += 0.02
-            
+        print(z)
         #z[i][1] += np.sign(z[i][1])*0.04
 
         R = np.zeros((2*len(measurements),2*len(measurements)))
