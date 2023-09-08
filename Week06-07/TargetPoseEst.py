@@ -50,6 +50,7 @@ def estimate_pose(camera_matrix, obj_info, robot_pose):
     pixel_height = target_box[3]
     pixel_center = target_box[0]
     distance = true_height/pixel_height * focal_length  # estimated distance between the object and the robot based on height
+    print(distance)
     # image size 640x480 pixels, 640/2=320
     x_shift = 320/2 - pixel_center              # x distance between bounding box centre and centreline in camera view
     theta = np.arctan(x_shift/focal_length)     # angle of object relative to the robot
@@ -62,7 +63,7 @@ def estimate_pose(camera_matrix, obj_info, robot_pose):
     # location of object in the world frame
     target_pose = {'y': (robot_pose[1]+relative_pose['y']*np.sin(ang))[0],
                    'x': (robot_pose[0]+relative_pose['x']*np.cos(ang))[0]}
-
+    
     return target_pose
 
 
@@ -79,9 +80,34 @@ def merge_estimations(target_pose_dict):
 
     ######### Replace with your codes #########
     # TODO: replace it with a solution to merge the multiple occurrences of the same class type (e.g., by a distance threshold)
-    target_est = target_pose_dict
+    distance_threshold = 0.02
+    
+    target_est = {}
+
+    for key, pose in target_pose_dict.items():
+        # Check if there is already a similar target in target_est
+        merged = False
+        for existing_key, existing_pose in target_est.items():
+            # Calculate the distance between the new and existing poses
+            distance = np.sqrt((pose['x'] - existing_pose['x'])**2 + (pose['y'] - existing_pose['y'])**2)
+
+            if distance < distance_threshold:
+                # Merge the poses by averaging their positions
+                merged_pose = {
+                    'x': (pose['x'] + existing_pose['x']) / 2,
+                    'y': (pose['y'] + existing_pose['y']) / 2
+                }
+                target_est[existing_key] = merged_pose
+                merged = True
+                break
+
+        if not merged:
+            # If no similar target was found, add it as a new target
+            target_est[key] = pose
+
+    # target_est = target_pose_dict
     #########
-   
+
     return target_est
 
 
