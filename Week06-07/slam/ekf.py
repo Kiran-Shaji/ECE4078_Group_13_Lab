@@ -197,9 +197,9 @@ class EKF:
             self.P = np.concatenate((self.P, np.zeros((self.P.shape[0], 2))), axis=1)
             self.P[-2,-2] = self.init_lm_cov**2
             self.P[-1,-1] = self.init_lm_cov**2
-            if len(self.taglist) == 1:
-                self.P[-2,-2] = 0.05
-                self.P[-1,-1] = 0.05
+            if len(self.taglist) <= 2:
+                self.P[-2,-2] = 100
+                self.P[-1,-1] = 100
 
     ##########################################
     ##########################################

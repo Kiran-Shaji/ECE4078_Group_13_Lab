@@ -9,7 +9,7 @@ from YOLO.detector import Detector
 
 # list of target fruits and vegs types
 # Make sure the names are the same as the ones used in your YOLO model
-TARGET_TYPES = ['orange', 'lemon', 'lime', 'tomato', 'capsicum', 'potato', 'pumpkin', 'garlic']
+TARGET_TYPES = ['Orange', 'Lemon', 'Lime', 'Tomato', 'Capsicum', 'Potato', 'Pumpkin', 'Garlic']
 
 
 def estimate_pose(camera_matrix, obj_info, robot_pose):
@@ -85,7 +85,7 @@ def merge_estimations(target_pose_dict):
     target_est = {}
 
     for key, pose in target_pose_dict.items():
-        # Check if there is already a similar target in target_est
+        # Check if there is already a similar target in target_est, written by GEN AI CHAT GPT-3.5
         merged = False
         for existing_key, existing_pose in target_est.items():
             # Calculate the distance between the new and existing poses
