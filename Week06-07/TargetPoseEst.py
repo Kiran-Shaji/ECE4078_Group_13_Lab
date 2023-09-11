@@ -35,10 +35,10 @@ def estimate_pose(camera_matrix, obj_info, robot_pose):
     # there are 8 possible types of fruits and vegs
     ######### Replace with your codes #########
     # TODO: measure actual sizes of targets [width, depth, height] and update the dictionary of true target dimensions
-    target_dimensions_dict = {'orange': [1.0,1.0,1.0], 'lemon': [1.0,1.0,1.0], 
-                              'lime': [1.0,1.0,1.0], 'tomato': [1.0,1.0,1.0], 
-                              'capsicum': [1.0,1.0,1.0], 'potato': [1.0,1.0,1.0], 
-                              'pumpkin': [1.0,1.0,1.0], 'garlic': [1.0,1.0,1.0]}
+    target_dimensions_dict = {'Orange': [0.082,0.084,0.078], 'Lemon': [0.08,0.053,0.051], 
+                              'Lime': [0.08,0.053,0.0535], 'Tomato': [0.074,0.074,0.073], 
+                              'Capsicum': [0.09,0.08,0.1], 'Potato': [0.1,0.072,0.062], 
+                              'Pumpkin': [0.085,0.085,0.079], 'Garlic': [0.068,0.062,0.075]}
     #########
 
     # estimate target pose using bounding box and robot pose
@@ -80,7 +80,7 @@ def merge_estimations(target_pose_dict):
 
     ######### Replace with your codes #########
     # TODO: replace it with a solution to merge the multiple occurrences of the same class type (e.g., by a distance threshold)
-    distance_threshold = 0.02
+    distance_threshold = 0.1
     
     target_est = {}
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     # merge the estimations of the targets so that there are at most 3 estimations of each target type
     target_est = {}
     target_est = merge_estimations(target_pose_dict)
-    print(target_est)
+    #print(target_est)
     # save target pose estimations
     with open(f'{script_dir}/lab_output/targets.txt', 'w') as fo:
         json.dump(target_est, fo, indent=4)
