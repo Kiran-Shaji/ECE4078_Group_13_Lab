@@ -9,15 +9,17 @@ import argparse
 import time
 
 # import SLAM components
-# sys.path.insert(0, "{}/slam".format(os.getcwd()))
-# from slam.ekf import EKF
-# from slam.robot import Robot
-# import slam.aruco_detector as aruco
+sys.path.insert(0, "{}/slam".format(os.getcwd()))
+from slam.ekf import EKF
+from slam.robot import Robot
+import slam.aruco_detector as aruco
 
 # import utility functions
 sys.path.insert(0, "util")
 from pibot import PenguinPi
 import measure as measure
+
+from operate import Operate
 
 
 def read_true_map(fname):
@@ -109,16 +111,21 @@ def drive_to_point(waypoint, robot_pose):
     # TODO: replace with your codes to make the robot drive to the waypoint
     # One simple strategy is to first turn on the spot facing the waypoint,
     # then drive straight to the way point
+    desired_angle = np.tanh((waypoint[1]-robot_pose[1])/(waypoint[0]-robot_pose[0])) 
+    print("Desired angle: {}".format(desired_angle))
+
+
 
     wheel_vel = 30 # tick
     
     # turn towards the waypoint
-    turn_time = 0.0 # replace with your calculation
+    turn_time = (baseline*2*np.pi)/(2*scale*wheel_vel) # replace with your calculation
     print("Turning for {:.2f} seconds".format(turn_time))
     ppi.set_velocity([0, 1], turning_tick=wheel_vel, time=turn_time)
     
     # after turning, drive straight to the waypoint
-    drive_time = 0.0 # replace with your calculation
+    distance = np.sqrt((waypoint[0]-robot_pose[0])**2 + (waypoint[1]-robot_pose[1])**2)
+    drive_time = distance/(scale*wheel_vel)
     print("Driving for {:.2f} seconds".format(drive_time))
     ppi.set_velocity([1, 0], tick=wheel_vel, time=drive_time)
     ####################################################
@@ -130,6 +137,9 @@ def get_robot_pose():
     ####################################################
     # TODO: replace with your codes to estimate the pose of the robot
     # We STRONGLY RECOMMEND you to use your SLAM code from M2 here
+    
+    # get the image from the robot
+
 
     # update the robot pose [x,y,theta]
     robot_pose = [0.0,0.0,0.0] # replace with your calculation
