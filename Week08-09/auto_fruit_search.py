@@ -16,8 +16,8 @@ import slam.aruco_detector as aruco
 
 # import utility functions
 sys.path.insert(0, "util")
-from pibot import PenguinPi
-import measure as measure
+from util.pibot import PenguinPi
+import util.measure as measure
 
 from operate import Operate
 
@@ -139,6 +139,16 @@ def get_robot_pose():
     # We STRONGLY RECOMMEND you to use your SLAM code from M2 here
     
     # get the image from the robot
+    img = ppi.get_image()
+
+    # detect the ArUco markers
+    lms, aruco_img = aruco.detect_marker_positions(img)
+
+    # update only the robots position
+    drive_meas = measure.Drive(lv, rv, dt)
+    ekf.predict(drive_meas)
+    ekf.add_landmarks(lms)
+    ekf.update(lms)
 
 
     # update the robot pose [x,y,theta]
@@ -153,14 +163,49 @@ if __name__ == "__main__":
     parser.add_argument("--map", type=str, default='M4_true_map_full.txt') # change to 'M4_true_map_part.txt' for lv2&3
     parser.add_argument("--ip", metavar='', type=str, default='192.168.50.1')
     parser.add_argument("--port", metavar='', type=int, default=8080)
+
+    ### ADDED CODE ###
+
+    parser.add_argument("--calib_dir", type=str, default="calibration/param/")
+
+    ### ADDED CODE ###
+
+
     args, _ = parser.parse_known_args()
 
     ppi = PenguinPi(args.ip,args.port)
+
+
+
+    ### ADDED CODE ###
+    datadir = args.calib_dir
+    ip = args.ip
+    fileK = "{}intrinsic.txt".format(datadir)
+    camera_matrix = np.loadtxt(fileK, delimiter=',')
+    fileD = "{}distCoeffs.txt".format(datadir)
+    dist_coeffs = np.loadtxt(fileD, delimiter=',')
+    fileS = "{}scale.txt".format(datadir)
+    scale = np.loadtxt(fileS, delimiter=',')
+    if ip == 'localhost':
+        scale /= 2
+    fileB = "{}baseline.txt".format(datadir)
+    baseline = np.loadtxt(fileB, delimiter=',')
+    robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
+    ekf =  EKF(robot)
+    
+    ### ADDED CODE ###
+
+
+
+
+
 
     # read in the true map
     fruits_list, fruits_true_pos, aruco_true_pos = read_true_map(args.map)
     search_list = read_search_list()
     print_target_fruits_pos(search_list, fruits_list, fruits_true_pos)
+    ekf.markers = aruco_true_pos
+    ekf.taglist = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     waypoint = [0.0,0.0]
     robot_pose = [0.0,0.0,0.0]
