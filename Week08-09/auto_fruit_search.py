@@ -195,11 +195,6 @@ if __name__ == "__main__":
     
     ### ADDED CODE ###
 
-
-
-
-
-
     # read in the true map
     fruits_list, fruits_true_pos, aruco_true_pos = read_true_map(args.map)
     search_list = read_search_list()

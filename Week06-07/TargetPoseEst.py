@@ -151,7 +151,7 @@ if __name__ == "__main__":
         for detection in bounding_boxes:
             # count the occurrence of each target type
             occurrence = detected_type_list.count(detection[0])
-            target_pose_dict[f'{detection[0]}_{occurrence}'] = estimate_pose(camera_matrix, detection, robot_pose)
+            target_pose_dict[f'{detection[0].lower()}_{occurrence}'] = estimate_pose(camera_matrix, detection, robot_pose)
 
             detected_type_list.append(detection[0])
 
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     target_est = {}
     target_est = merge_estimations(target_pose_dict)
     # change each string to lowercase in the target_est dictionary
-    target_est = {fruits.lower(): targets for fruits, targets in target_est.items()}
+    # target_est = {fruits.lower(): targets for fruits, targets in target_est.items()}
     #print(target_est)
     # save target pose estimations
     with open(f'{script_dir}/lab_output/targets.txt', 'w') as fo:

@@ -20,7 +20,7 @@ You will use your M1 (teleoperation) code to drive your robot around this unknow
 
 **You'll need to install additional python packages** for M2 by typing the following commands in the terminal (remember to activate your venv first by typing ```PenguinPi\Scripts\activate```):
 ```
-python3 -m pip install machinevision-toolbox-python spatialmath-python==0.8.9 opencv-contrib-python matplotlib
+python -m pip install machinevision-toolbox-python spatialmath-python==0.8.9 opencv-contrib-python matplotlib
 ```
 
 If you are using the Linux env (sim + physical robot), after installing the python packages, run the following commands to update your catkin_ws
