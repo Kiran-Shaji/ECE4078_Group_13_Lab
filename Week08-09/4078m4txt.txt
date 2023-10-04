@@ -1,0 +1,24 @@
+cd "C:\Users\kiran\OneDrive - Monash University\Units\2023\ECE4078\Project"
+
+PenguinPi\Scripts\activate
+
+cd C:\Users\kiran\Downloads\4078M4
+
+
+python "auto_fruit_search - Copy.py"
+
+python operate.py --ip 192.168.50.1 --port 8080
+
+
+python TargetPoseEst.py
+
+python mapping_eval.py --true-map TrueMap.txt
+
+
+Start SLAM: ENTER
+
+Start Image Detector: P
+
+Take Photo: N
+
+Save SLAM MAP: S

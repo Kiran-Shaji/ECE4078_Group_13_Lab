@@ -105,7 +105,13 @@ class EKF:
 
         self.robot.drive(raw_drive_meas)
         #Uncertainty Estimate
+        # print(F.shape)
+        # print(F.T.shape)
+        # print(self.P.shape)
         Q = self.predict_covariance(raw_drive_meas)
+
+        #print(f"Q is {Q}")
+        # print(Q.shape)
         # could we scale Q based on the steering angle? 1 + abs(Left wheel - right wheel)/(2*left speed + 2*right speed)
         sigma_K_bar = (F @ self.P @ F.T) + Q
         self.P = sigma_K_bar
@@ -125,7 +131,7 @@ class EKF:
         for i in range(len(z)):
             if i%2 == 0:
                 z[i] += 0.02
-        print(z)
+        #print(z)
         #z[i][1] += np.sign(z[i][1])*0.04
 
         R = np.zeros((2*len(measurements),2*len(measurements)))
@@ -158,6 +164,9 @@ class EKF:
 
         self.P = P_update
         self.set_state_vector(x_update)
+
+        #print(self.robot.state)
+
         return
 
     def state_transition(self, raw_drive_meas):

@@ -108,6 +108,7 @@ class Operate:
     # SLAM with ARUCO markers       
     def update_slam(self, drive_meas):
         lms, self.aruco_img = self.aruco_det.detect_marker_positions(self.img)
+        
         if self.request_recover_robot:
             is_success = self.ekf.recover_from_pause(lms)
             if is_success:
@@ -118,6 +119,7 @@ class Operate:
                 self.ekf_on = False
             self.request_recover_robot = False
         elif self.ekf_on:  # and not self.debug_flag:
+            #print("we made it here")
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
             self.ekf.update(lms)
@@ -183,6 +185,8 @@ class Operate:
 
     # paint the GUI            
     def draw(self, canvas):
+        TITLE_FONT = pygame.font.Font('pics/8-BitMadness.ttf', 35)
+        TEXT_FONT = pygame.font.Font('pics/8-BitMadness.ttf', 40)
         canvas.blit(self.bg, (0, 0))
         text_colour = (220, 220, 220)
         v_pad = 40
@@ -233,6 +237,8 @@ class Operate:
 
     @staticmethod
     def put_caption(canvas, caption, position, text_colour=(200, 200, 200)):
+        TITLE_FONT = pygame.font.Font('pics/8-BitMadness.ttf', 35)
+        TEXT_FONT = pygame.font.Font('pics/8-BitMadness.ttf', 40)
         caption_surface = TITLE_FONT.render(caption,
                                             False, text_colour)
         canvas.blit(caption_surface, (position[0], position[1] - 25))
