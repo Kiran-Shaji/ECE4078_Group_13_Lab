@@ -89,6 +89,7 @@ class Operate:
         if self.data is not None:
             self.data.write_keyboard(lv, rv)
         dt = time.time() - self.control_clock
+        #print("Driving for {:.2f} seconds".format(dt))
         # running in sim
         if args.ip == 'localhost':
             drive_meas = measure.Drive(lv, rv, dt)
@@ -354,6 +355,7 @@ if __name__ == "__main__":
             pygame.display.update()
             counter += 2
 
+    
     operate = Operate(args)
 
     while start:
@@ -367,3 +369,4 @@ if __name__ == "__main__":
         # visualise
         operate.draw(canvas)
         pygame.display.update()
+        #print(operate.ekf.robot.state.squeeze().tolist())

@@ -121,13 +121,13 @@ def drive_to_point(waypoint, robot_pose):
     
     # turn towards the waypoint
     full_turn_time = (baseline*2*np.pi)/(2*scale*wheel_vel) # time to do 1 rotation, so we need to rotate to get to the desired angle
-    
-    # while robot_pose[2] > 2*np.pi:
-    #     robot_pose[2] -= 2*np.pi
-
-    # while robot_pose[2] < -2*np.pi:
-    #     robot_pose[2] += 2*np.pi
     in_rad = robot_pose[2]
+    while in_rad > 2*np.pi:
+        in_rad -= 2*np.pi
+
+    while in_rad < -2*np.pi:
+        in_rad += 2*np.pi
+    
     # we only need to do a partial turn. I
     angle_delta = desired_angle - in_rad
     if angle_delta > np.pi:
@@ -148,17 +148,19 @@ def drive_to_point(waypoint, robot_pose):
     if turn_time > 0.0:
         lv, rv = operate.pibot.set_velocity([0, turn_direction], turning_tick=wheel_vel, time=turn_time)
     #print([lv, rv])
-    drive_meas = measure.Drive(lv, rv, turn_time)
+    drive_meas = measure.Drive(lv, -rv, turn_time)
     time.sleep(0.2)
     operate.take_pic()
     operate.update_slam(drive_meas)
     operate.draw(canvas)
     pygame.display.update()
-    # for _ in range(3):
+    for _ in range(3):
         
-    #     lv, rv = operate.pibot.set_velocity([0, 0], tick=0.0, time=0.0)
-    #     drive_meas = measure.Drive(lv, rv, 0.0)
-    #     operate.update_slam(drive_meas)
+        lv, rv = operate.pibot.set_velocity([0, 0], tick=0.0, time=0.0)
+        drive_meas = measure.Drive(lv, rv, 0.0)
+        operate.update_slam(drive_meas)
+        operate.draw(canvas)
+        pygame.display.update()
 
     
     # after turning, drive straight to the waypoint
@@ -166,19 +168,19 @@ def drive_to_point(waypoint, robot_pose):
     drive_time = distance/(scale*wheel_vel)
     print("Driving for {:.2f} seconds".format(drive_time))
     lv, rv = operate.pibot.set_velocity([1, 0], tick=wheel_vel, time=drive_time)
-    drive_meas = measure.Drive(lv, rv, drive_time)
+    drive_meas = measure.Drive(lv, -rv, drive_time)
     time.sleep(0.2)
     operate.take_pic()
     operate.update_slam(drive_meas)
     operate.draw(canvas)
     pygame.display.update()
-    # for _ in range(3):
+    for _ in range(3):
         
-    #     lv, rv = operate.pibot.set_velocity([0, 0], tick=0.0, time=0.0)
-    #     drive_meas = measure.Drive(lv, rv, 0.0)
-    #     operate.update_slam(drive_meas)
-    #     operate.draw(canvas)
-    #     pygame.display.update()
+        lv, rv = operate.pibot.set_velocity([0, 0], tick=0.0, time=0.0)
+        drive_meas = measure.Drive(lv, rv, 0.0)
+        operate.update_slam(drive_meas)
+        operate.draw(canvas)
+        pygame.display.update()
     ####################################################
 
     print("Arrived at [{}, {}]".format(waypoint[0], waypoint[1]))
@@ -229,9 +231,9 @@ if __name__ == "__main__":
 
     # 3. Maybe add yolo detector
 
-
+    MAP_NAME = 'M5_Map_Output.txt'
     parser = argparse.ArgumentParser("Fruit searching")
-    parser.add_argument("--map", type=str, default='M4_true_map_full.txt') # change to 'M4_true_map_part.txt' for lv2&3
+    parser.add_argument("--map", type=str, default=f'lab_output/{MAP_NAME}') # change to 'M4_true_map_part.txt' for lv2&3
     parser.add_argument("--ip", metavar='', type=str, default='192.168.50.1')
     parser.add_argument("--port", metavar='', type=int, default=8080)
 
@@ -313,25 +315,15 @@ if __name__ == "__main__":
     #ekf.markers = aruco_true_pos
     #print(aruco_true_pos)
     # will also have to verify that this is what it is meant to look like
-    operate.ekf.taglist = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-    # this for loop initialises the covariance of the 10 markers that we just added to be super low
-    for lm in range(len(aruco_true_pos)):
-                        
-            
-            lm_inertial = aruco_true_pos[lm].reshape(-1, 1)
-
-            
-            operate.ekf.markers = np.concatenate((operate.ekf.markers, lm_inertial), axis=1)
-
-            # Create a simple, large covariance to be fixed by the update step
-            operate.ekf.P = np.concatenate((operate.ekf.P, np.zeros((2, operate.ekf.P.shape[1]))), axis=0)
-            operate.ekf.P = np.concatenate((operate.ekf.P, np.zeros((operate.ekf.P.shape[0], 2))), axis=1)
-            operate.ekf.P[-2,-2] = 0.1
-            operate.ekf.P[-1,-1] = 0.1
+    lms = []
+    for i,lm in enumerate(aruco_true_pos):
+        measure_lm = measure.Marker(np.array([[lm[0]],[lm[1]]]),i+1, covariance=(0.0*np.eye(2)))
+        lms.append(measure_lm)
+    operate.ekf.add_fixed_landmark(lms)
 
     waypoint = [0.0,0.0]
     robot_pose = [0.0,0.0,0.0]
+    waypoint_list = [[0.3, -0.3], [0, 0]]
     operate.ekf_on = True
 
     # The following is only a skeleton code for semi-auto navigation

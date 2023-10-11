@@ -76,13 +76,12 @@ class RRT:
             
             # 4. Check if nearby_node is in free space (i.e., it is collision free). If collision free, add node
             # to self.node_list
-            if self.is_collision_free(nearby_node): 
+            if self.is_collision_free(nearby_node):
                 self.node_list.append(nearby_node)
             
             # Please remove return None when you start coding
             
             #ENDTODO -----------------------------------------------------------------------
-                
             # If we are close to goal, stop expansion and generate path
             if self.calc_dist_to_goal(self.node_list[-1].x, self.node_list[-1].y) <= self.expand_dis:
                 final_node = self.steer(self.node_list[-1], self.end, self.expand_dis)

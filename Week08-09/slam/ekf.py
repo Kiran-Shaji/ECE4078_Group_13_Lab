@@ -130,7 +130,7 @@ class EKF:
         z = np.concatenate([lm.position.reshape(-1,1) for lm in measurements], axis=0)
         for i in range(len(z)):
             if i%2 == 0:
-                z[i] += 0.02
+                z[i] += 0.04
         #print(z)
         #z[i][1] += np.sign(z[i][1])*0.04
 
@@ -178,7 +178,7 @@ class EKF:
     def predict_covariance(self, raw_drive_meas):
         n = self.number_landmarks()*2 + 3
         Q = np.zeros((n,n))
-        Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas)+ 0.01*np.eye(3)
+        Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas)+ 0.002*np.eye(3)
         return Q
 
     def add_landmarks(self, measurements):
@@ -206,10 +206,25 @@ class EKF:
             self.P = np.concatenate((self.P, np.zeros((self.P.shape[0], 2))), axis=1)
             self.P[-2,-2] = self.init_lm_cov**2
             self.P[-1,-1] = self.init_lm_cov**2
-            if len(self.taglist) <= 2:
-                self.P[-2,-2] = 100
-                self.P[-1,-1] = 100
+            
+    def add_fixed_landmark(self, measurements): # add true landmark position
+        if not measurements:
+            return
 
+        # Add new landmarks to the state
+        for lm in measurements:
+            if lm.tag in self.taglist:
+                # ignore known tags
+                continue
+
+            self.taglist.append(int(lm.tag))
+            self.markers = np.concatenate((self.markers, lm.position), axis=1)
+
+            # Create a simple, large covariance to be fixed by the update step
+            self.P = np.concatenate((self.P, np.zeros((2, self.P.shape[1]))), axis=0)
+            self.P = np.concatenate((self.P, np.zeros((self.P.shape[0], 2))), axis=1)
+            self.P[-2,-2] = 1e-7
+            self.P[-1,-1] = 1e-7
     ##########################################
     ##########################################
     ##########################################
